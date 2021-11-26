@@ -1,12 +1,19 @@
 const { Compilation } = require('webpack');
 const { ConcatSource } = require('webpack-sources');
+const TerserPlugin = require('terser-webpack-plugin');
 
-const OUTPUT_FILENAME = 'output-dev.html';
+const OUTPUT_FILENAME = 'output.html';
 
 module.exports = {
   entry: './src/index.tsx',
-  mode: 'development',
-  devtool: 'source-map',
+  mode: 'production',
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin({
+      test: /.*/,
+      parallel: true
+    })]
+  },
   module: {
     rules: [
       {
