@@ -1,8 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Derp from './derp.jsx';
+import Hello from './hello.jsx';
 
 let htmlEl = document.documentElement;
 let bodyEl = document.createElement('body');
+let appEl = document.createElement('div');
 htmlEl.appendChild(bodyEl);
-ReactDOM.render(<Derp />, bodyEl);
+bodyEl.appendChild(appEl);
+
+ReactDOM.render(<Hello />, appEl);

@@ -1,8 +1,11 @@
-function derp(a) {
+import React from 'react';
+
+export function exclamify(a) {
   return a + '!';
 }
+
 export default () => <>
-  <div>{derp('Hello')}</div>
+  <div>{exclamify('Hello, world')}</div>
   <style jsx>{`
     div {
       color: red;
