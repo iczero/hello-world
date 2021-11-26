@@ -3,8 +3,9 @@ module.exports = {
     '@hellomouse/eslint-config-typescript'
   ],
   env: {
-    node: true,
-    es6: true
+    es6: true,
+    browser: true,
+    node: true
   },
   rules: {
     // js compatibility

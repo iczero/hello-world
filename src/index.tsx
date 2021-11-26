@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Hello from './hello.jsx';
+import Hello from './hello';
 
 let htmlEl = document.documentElement;
 let bodyEl = document.createElement('body');

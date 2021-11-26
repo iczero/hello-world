@@ -1,4 +1,4 @@
-const { Compilation } = require('webpack');
+const { Compilation, ProvidePlugin } = require('webpack');
 const { ConcatSource } = require('webpack-sources');
 const TerserPlugin = require('terser-webpack-plugin');
 
@@ -30,6 +30,9 @@ module.exports = {
     filename: OUTPUT_FILENAME
   },
   plugins: [
+    new ProvidePlugin({
+      process: 'process/browser'
+    }),
     {
       // wrap output in script tags
       // pile of hacks

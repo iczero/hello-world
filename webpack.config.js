@@ -1,4 +1,4 @@
-const { Compilation } = require('webpack');
+const { Compilation, ProvidePlugin } = require('webpack');
 const { ConcatSource } = require('webpack-sources');
 
 const OUTPUT_FILENAME = 'output-dev.html';
@@ -23,6 +23,9 @@ module.exports = {
     filename: OUTPUT_FILENAME
   },
   plugins: [
+    new ProvidePlugin({
+      process: 'process/browser'
+    }),
     {
       // wrap output in script tags
       // pile of hacks
