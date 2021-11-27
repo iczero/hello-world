@@ -14,8 +14,11 @@ jobs:
           cache: npm
       - run: npm install
       - run: npm run build:prod
+      - uses: actions/checkout@v2
+        with:
+          ref: gh-pages
+          clean: false
       - run: |
-          git checkout gh-pages
           cp dist/output.html index.html
           cp dist/output.html.LICENSE.txt index.html.LICENSE.txt
           git add index.html index.html.LICENSE.txt
