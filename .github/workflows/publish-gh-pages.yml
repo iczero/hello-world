@@ -32,5 +32,5 @@ jobs:
           revision=$(git rev-parse --short "$GITHUB_SHA")
           git config --global user.name iczero
           git config --global user.email 10750302+iczero@users.noreply.github.com
-          git commit -m "build $revision"
+          git commit --allow-empty -m "build $revision"
           git push
