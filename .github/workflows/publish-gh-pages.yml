@@ -1,0 +1,26 @@
+name: Publish app to GitHub Pages
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm install
+      - run: npm run build:prod
+      - run: |
+          git checkout gh-pages
+          cp dist/output.html index.html
+          cp dist/output.html.LICENSE.txt index.html.LICENSE.txt
+          git add index.html index.html.LICENSE.txt
+          revision=$(git rev-parse --short "$GITHUB_SHA")
+          git config --global user.name iczero
+          git config --global user.email 10750302+iczero@users.noreply.github.com
+          git commit -m "build $revision"
+          git push
