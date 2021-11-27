@@ -17,7 +17,11 @@
       "DOM"
     ],
     "jsx": "react",
-    "noEmit": true
+    "noEmit": true,
+    "types": [
+      // inform typescript of jsx attribute
+      "styled-jsx"
+    ]
   },
   "exclude": [
     "node_modules",

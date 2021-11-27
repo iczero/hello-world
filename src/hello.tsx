@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Buffer } from 'buffer';
+import { Link } from 'react-router-dom';
 import { Keccak, KeccakRand } from './keccak';
 import { Head } from './util';
 
@@ -32,22 +33,21 @@ export function KeccakButton() {
   </button>;
 }
 
-export function exclamify(a) {
+export function exclamify(a: string): string {
   return a + '!';
 }
 
-export default () => <>
-  <Head>
-    <title>Hello, world!</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  </Head>
-  <>
+export function HelloPage() {
+  return <div>
+    <Head>
+      <title>Hello, world!</title>
+    </Head>
     <div className="hello">{exclamify('Hello, world')}</div>
     <KeccakButton />
+    <div><Link to="/test">Test page</Link></div>
     <style jsx>{`
       .hello {
         font-size: 2em;
-        font-family: sans-serif;
         animation: rainbow 10s infinite;
       }
 
@@ -62,5 +62,5 @@ export default () => <>
         100% { color: red; }
       }
     `}</style>
-  </>
-</>;
+  </div>;
+}

@@ -11,7 +11,10 @@ module.exports = {
     minimize: true,
     minimizer: [new TerserPlugin({
       test: /.*/,
-      parallel: true
+      parallel: true,
+      extractComments: {
+        banner: false
+      }
     })]
   },
   module: {
@@ -45,9 +48,9 @@ module.exports = {
             },
             () => {
               const source = new ConcatSource();
-              source.add('<script>\n');
+              source.add('<script>');
               source.add(compilation.assets[OUTPUT_FILENAME]);
-              source.add('\n</script>\n');
+              source.add('</script>');
               compilation.assets[OUTPUT_FILENAME] = source;
             }
           );
