@@ -14,13 +14,20 @@ jobs:
           cache: npm
       - run: npm install
       - run: npm run build:prod
+      - uses: actions/upload-artifact@v2
+        with:
+          name: output
+          path: dist
       - uses: actions/checkout@v2
         with:
           ref: gh-pages
           clean: false
+          path: ./dist/gh-pages
       - run: |
-          cp dist/output.html index.html
-          cp dist/output.html.LICENSE.txt index.html.LICENSE.txt
+          cp dist/output.html dist/gh-pages/index.html
+          cp dist/output.html.LICENSE.txt dist/gh-pages/index.html.LICENSE.txt
+      - working-directory: ./dist/gh-pages
+        run: |
           git add index.html index.html.LICENSE.txt
           revision=$(git rev-parse --short "$GITHUB_SHA")
           git config --global user.name iczero
