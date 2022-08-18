@@ -48,7 +48,7 @@ export function HelloPage() {
     <style jsx>{`
       .hello {
         font-size: 2em;
-        animation: rainbow 10s infinite;
+        animation: rainbow 10s linear infinite;
       }
 
       @keyframes rainbow {
