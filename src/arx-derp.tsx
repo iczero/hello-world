@@ -88,6 +88,8 @@ export function ARXDerp() {
   let [canvasHeight, setCanvasHeight] = useState(CANVAS_DEFAULT_HEIGHT);
   let [rngCurrent, setRngCurrent] = useState<number | string>(0);
   let [onesFreq, setOnesFreq] = useState(0);
+  let [calculatedPeriod, setCalculatedPeriod] = useState(0);
+  let [manualSeed, setManualSeed] = useState('');
   useLayoutEffect(() => {
     rng.current = new BadRandom(seedFromCryptoAPI());
     setRngCurrent(rng.current.getState());
@@ -128,6 +130,26 @@ export function ARXDerp() {
 
   useEffect(() => refreshCanvas(), [canvasWidth, canvasHeight]);
 
+  function calculatePeriod() {
+    let gen = rng.current!;
+    let period = 0;
+    let seen = new Uint8Array(2 ** 32 - 1);
+    while (true) {
+      let val = gen.next();
+      let idx = Math.floor(val / 8);
+      let bit = val & 8;
+      if (seen[idx] & (1 << bit)) break;
+      seen[idx] |= 1 << bit;
+      period++;
+    }
+    setCalculatedPeriod(period);
+  }
+
+  function reseed() {
+    rng.current!.seed(seedFromCryptoAPI());
+    setRngCurrent(rng.current!.getState());
+  }
+
   return <div>
     <div>
       <button onClick={() => setRngCurrent(rng.current!.next())}>
@@ -139,8 +161,17 @@ export function ARXDerp() {
         `}</style>
       </button>
       <button onClick={() => refreshCanvas()}>Refresh canvas</button>
+      <br />
+      <button onClick={() => calculatePeriod()}>{'Calculate period: ' + calculatedPeriod}</button>
+      <button onClick={() => reseed()}>Reseed</button>
     </div>
     <div>
+      Manual seed: <input type="number" value={manualSeed} onChange={ev => {
+        setManualSeed(ev.target.value);
+        let seed = +ev.target.value;
+        if (!Number.isNaN(seed)) rng.current!.seed(seed);
+      }} />
+      <br />
       Canvas width: <input type="number" value={canvasWidth || ''}
         onChange={ev => setCanvasWidth(+ev.target.value || 0)} />
       <br />
