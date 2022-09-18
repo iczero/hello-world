@@ -45,6 +45,7 @@ export function HelloPage() {
     <div className="hello">{exclamify('Hello, world')}</div>
     <KeccakButton />
     <div><Link to="/test">Test page</Link></div>
+    <div><Link to="/arx-derp">Bad random numbers</Link></div>
     <style jsx>{`
       .hello {
         font-size: 2em;

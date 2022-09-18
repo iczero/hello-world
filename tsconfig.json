@@ -16,12 +16,9 @@
       "esnext",
       "DOM"
     ],
-    "jsx": "react",
+    "jsx": "preserve",
     "noEmit": true,
-    "types": [
-      // inform typescript of jsx attribute
-      "styled-jsx"
-    ]
+    "typeRoots": ["node_modules/@types", "./typings"]
   },
   "exclude": [
     "node_modules",
