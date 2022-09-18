@@ -60,13 +60,64 @@ function seedFromCryptoAPI(): number {
   return v[0];
 }
 
+class RandomBitWrapper {
+  bitPos = 0;
+  current: number;
+
+  constructor(public rng: BadRandom) {
+    this.current = rng.next();
+  }
+
+  next(): boolean {
+    if (this.bitPos >= 32) {
+      this.current = this.rng.next();
+      this.bitPos = 0;
+    }
+
+    return Boolean(this.current & (1 << this.bitPos++));
+  }
+}
+
+const CANVAS_WIDTH = 512;
+const CANVAS_HEIGHT = 512;
+
 export function ARXDerp() {
   let rng: React.MutableRefObject<BadRandom | null> = useRef(null);
-  let [rngCurrent, setRngCurrent] = useState(0);
+  let canvas: React.MutableRefObject<HTMLCanvasElement | null> = useRef(null);
+  let [rngCurrent, setRngCurrent] = useState<number | string>(0);
   useLayoutEffect(() => {
     rng.current = new BadRandom(seedFromCryptoAPI());
     setRngCurrent(rng.current.getState());
   }, []);
+
+  function refreshCanvas() {
+    let width = canvas.current!.width;
+    let height = canvas.current!.height;
+    let ctx = canvas.current!.getContext('2d');
+    if (!ctx) {
+      // ah yes the pinnacle of error reporting
+      setRngCurrent('canvas error :(');
+      return;
+    }
+    let imageData = ctx.createImageData(width, height);
+    let imageBuf = imageData.data;
+
+    let bitWrapper = new RandomBitWrapper(rng.current!);
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        // ImageData uses RGBA
+        let pos = (width * y + x) * 4;
+        let value = Number(bitWrapper.next()) * 255;
+        imageBuf[pos + 0] = value; // red
+        imageBuf[pos + 1] = value; // green
+        imageBuf[pos + 2] = value; // blue
+        imageBuf[pos + 3] = 255;
+      }
+    }
+
+    ctx.putImageData(imageData, 0, 0);
+  }
+
   return <div>
     <button onClick={() => setRngCurrent(rng.current!.next())}>
       <pre>{rngCurrent}</pre>
@@ -76,5 +127,9 @@ export function ARXDerp() {
         }
       `}</style>
     </button>
+
+    <button onClick={() => refreshCanvas()}>Refresh canvas</button>
+    <br />
+    <canvas ref={canvas} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
   </div>;
 }
