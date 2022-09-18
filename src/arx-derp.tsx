@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from 'react';
+import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 
 function u8RotateLeft(a: number, n: number): number {
   a &= 0xff; // ensure value in range
@@ -119,6 +119,8 @@ export function ARXDerp() {
 
     ctx.putImageData(imageData, 0, 0);
   }
+
+  useEffect(() => refreshCanvas(), [canvasWidth, canvasHeight]);
 
   return <div>
     <div>
