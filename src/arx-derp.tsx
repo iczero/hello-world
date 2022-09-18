@@ -87,6 +87,7 @@ export function ARXDerp() {
   let [canvasWidth, setCanvasWidth] = useState(CANVAS_DEFAULT_WIDTH);
   let [canvasHeight, setCanvasHeight] = useState(CANVAS_DEFAULT_HEIGHT);
   let [rngCurrent, setRngCurrent] = useState<number | string>(0);
+  let [onesFreq, setOnesFreq] = useState(0);
   useLayoutEffect(() => {
     rng.current = new BadRandom(seedFromCryptoAPI());
     setRngCurrent(rng.current.getState());
@@ -101,15 +102,19 @@ export function ARXDerp() {
       setRngCurrent('canvas error :(');
       return;
     }
+    // skip rendering if zero-sized canvas
+    if (!width || !height) return;
     let imageData = ctx.createImageData(width, height);
     let imageBuf = imageData.data;
 
     let bitWrapper = new RandomBitWrapper(rng.current!);
+    let onesCount = 0;
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         // ImageData uses RGBA
         let pos = (width * y + x) * 4;
         let value = Number(bitWrapper.next()) * 255;
+        if (value) onesCount++;
         imageBuf[pos + 0] = value; // red
         imageBuf[pos + 1] = value; // green
         imageBuf[pos + 2] = value; // blue
@@ -118,6 +123,7 @@ export function ARXDerp() {
     }
 
     ctx.putImageData(imageData, 0, 0);
+    setOnesFreq(onesCount / (width * height));
   }
 
   useEffect(() => refreshCanvas(), [canvasWidth, canvasHeight]);
@@ -135,11 +141,13 @@ export function ARXDerp() {
       <button onClick={() => refreshCanvas()}>Refresh canvas</button>
     </div>
     <div>
-      Canvas width: <input type="number" value={canvasWidth}
-        onChange={ev => setCanvasWidth(+ev.target.value)} />
+      Canvas width: <input type="number" value={canvasWidth || ''}
+        onChange={ev => setCanvasWidth(+ev.target.value || 0)} />
       <br />
-      Canvas height: <input type="number" value={canvasHeight}
-        onChange={ev => setCanvasHeight(+ev.target.value)} />
+      Canvas height: <input type="number" value={canvasHeight || ''}
+        onChange={ev => setCanvasHeight(+ev.target.value || 0)} />
+      <br />
+      Frequency of ones: {onesFreq}
     </div>
     <canvas ref={canvas} width={canvasWidth} height={canvasHeight} />
   </div>;
