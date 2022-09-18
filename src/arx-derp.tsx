@@ -44,8 +44,8 @@ class BadRandom {
     // xor bytes 0 and 3, store in 3; xor bytes 1 and 2, store in 1
     sv.setUint8(3, sv.getUint8(0) ^ sv.getUint8(3));
     sv.setUint8(1, sv.getUint8(1) ^ sv.getUint8(2));
-    // rotate entire state right by 3
-    sv.setUint32(0, u32RotateRight(sv.getUint32(0, le), 3), le);
+    // rotate entire state right by 19
+    sv.setUint32(0, u32RotateRight(sv.getUint32(0, le), 19), le);
   }
 
   next(): number {
@@ -78,12 +78,14 @@ class RandomBitWrapper {
   }
 }
 
-const CANVAS_WIDTH = 512;
-const CANVAS_HEIGHT = 512;
+const CANVAS_DEFAULT_WIDTH = 32;
+const CANVAS_DEFAULT_HEIGHT = 512;
 
 export function ARXDerp() {
   let rng: React.MutableRefObject<BadRandom | null> = useRef(null);
   let canvas: React.MutableRefObject<HTMLCanvasElement | null> = useRef(null);
+  let [canvasWidth, setCanvasWidth] = useState(CANVAS_DEFAULT_WIDTH);
+  let [canvasHeight, setCanvasHeight] = useState(CANVAS_DEFAULT_HEIGHT);
   let [rngCurrent, setRngCurrent] = useState<number | string>(0);
   useLayoutEffect(() => {
     rng.current = new BadRandom(seedFromCryptoAPI());
@@ -119,17 +121,24 @@ export function ARXDerp() {
   }
 
   return <div>
-    <button onClick={() => setRngCurrent(rng.current!.next())}>
-      <pre>{rngCurrent}</pre>
-      <style jsx>{`
-        pre {
-          margin: 0;
-        }
-      `}</style>
-    </button>
-
-    <button onClick={() => refreshCanvas()}>Refresh canvas</button>
-    <br />
-    <canvas ref={canvas} width={CANVAS_WIDTH} height={CANVAS_HEIGHT} />
+    <div>
+      <button onClick={() => setRngCurrent(rng.current!.next())}>
+        <pre>{rngCurrent}</pre>
+        <style jsx>{`
+          pre {
+            margin: 0;
+          }
+        `}</style>
+      </button>
+      <button onClick={() => refreshCanvas()}>Refresh canvas</button>
+    </div>
+    <div>
+      Canvas width: <input type="number" value={canvasWidth}
+        onChange={ev => setCanvasWidth(+ev.target.value)} />
+      <br />
+      Canvas height: <input type="number" value={canvasHeight}
+        onChange={ev => setCanvasHeight(+ev.target.value)} />
+    </div>
+    <canvas ref={canvas} width={canvasWidth} height={canvasHeight} />
   </div>;
 }
