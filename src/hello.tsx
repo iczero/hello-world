@@ -92,7 +92,7 @@ export function HelloWorld() {
         0% { color: red; }
         14.28% { color: orange; }
         28.57% { color: yellow; }
-        42.86% { color: green; }
+        42.86% { color: lime; }
         57.14% { color: blue; }
         71.43% { color: indigo; }
         85.71% { color: violet; }
