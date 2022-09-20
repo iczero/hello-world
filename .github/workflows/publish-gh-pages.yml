@@ -25,6 +25,9 @@ jobs:
           cache: npm
       - run: npm install
       - run: npm run build:prod
+      - run: |
+          mv dist/output.html dist/index.html
+          mv dist/output.html.LICENSE.txt dist/index.html.LICENSE.txt
       - uses: actions/upload-pages-artifact@v1
         with:
           path: dist
