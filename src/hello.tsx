@@ -45,20 +45,28 @@ export function exclamify(a: string): string {
 export function HelloWorld() {
   let rainbowEl: MutableRefObject<HTMLSpanElement | null> = useRef(null);
   let colorEl: MutableRefObject<HTMLSpanElement | null> = useRef(null);
-  let shouldRun = useRef(true);
+  let showColorState: MutableRefObject<{
+    run: boolean;
+    computed: null | CSSStyleDeclaration;
+  }> = useRef({
+    run: true,
+    computed: null
+  });
 
   useEffect(() => {
     function updateColor() {
       let el = rainbowEl.current;
-      if (!el || !shouldRun.current) return;
-      let computed = window.getComputedStyle(el);
+      if (!el || !showColorState.current.run) return;
+      if (!showColorState.current.computed) {
+        showColorState.current.computed = window.getComputedStyle(el);
+      }
       if (colorEl.current) {
-        colorEl.current.innerText = computed['color'];
+        colorEl.current.textContent = showColorState.current.computed['color'];
       }
       requestAnimationFrame(updateColor);
     }
     updateColor();
-    return () => void (shouldRun.current = false);
+    return () => void (showColorState.current.run = false);
   });
 
   return <>
