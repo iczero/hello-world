@@ -1,5 +1,5 @@
 const { Compilation, ProvidePlugin } = require('webpack');
-const { ConcatSource } = require('webpack-sources');
+const { ConcatSource, RawSource } = require('webpack-sources');
 const TerserPlugin = require('terser-webpack-plugin');
 
 const OUTPUT_FILENAME = 'output.html';
@@ -48,6 +48,8 @@ module.exports = {
             },
             () => {
               const source = new ConcatSource();
+              // unicode BOM to ensure UTF-8 encoding
+              source.add(new RawSource(Buffer.from([0xef, 0xbb, 0xbf])));
               source.add('<script>');
               source.add(compilation.assets[OUTPUT_FILENAME]);
               source.add('</script>');
