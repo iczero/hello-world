@@ -4,7 +4,7 @@ const { ConcatSource } = require('webpack-sources');
 const OUTPUT_FILENAME = 'output-dev.html';
 
 module.exports = {
-  entry: './src/index.tsx',
+  entry: './src/initialize.tsx',
   mode: 'development',
   devtool: 'source-map',
   module: {

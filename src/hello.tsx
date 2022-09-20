@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { MutableRefObject, useEffect, useRef, useState } from 'react';
 import { Buffer } from 'buffer';
 import { Link } from 'react-router-dom';
 import { Keccak, KeccakRand } from './keccak';
@@ -23,7 +23,12 @@ export function getRandomString() {
 
 export function KeccakButton() {
   let [randVal, setRandVal] = useState(getRandomString);
-  return <button onClick={() => setRandVal(getRandomString())}>
+  function buttonClicked() {
+    let val = getRandomString();
+    setRandVal(val);
+    navigator.clipboard?.writeText(val);
+  }
+  return <button onClick={buttonClicked}>
     <pre>{randVal}</pre>
     <style jsx>{`
       pre {
@@ -37,19 +42,42 @@ export function exclamify(a: string): string {
   return a + '!';
 }
 
-export function HelloPage() {
-  return <div>
-    <Head>
-      <title>Hello, world!</title>
-    </Head>
-    <div className="hello">{exclamify('Hello, world')}</div>
-    <KeccakButton />
-    <div><Link to="/test">Test page</Link></div>
-    <div><Link to="/arx-derp">Bad random numbers</Link></div>
+export function HelloWorld() {
+  let rainbowEl: MutableRefObject<HTMLSpanElement | null> = useRef(null);
+  let colorEl: MutableRefObject<HTMLSpanElement | null> = useRef(null);
+  let shouldRun = useRef(true);
+
+  useEffect(() => {
+    function updateColor() {
+      let el = rainbowEl.current;
+      if (!el || !shouldRun.current) return;
+      let computed = window.getComputedStyle(el);
+      if (colorEl.current) {
+        colorEl.current.innerText = computed['color'];
+      }
+      requestAnimationFrame(updateColor);
+    }
+    updateColor();
+    return () => void (shouldRun.current = false);
+  });
+
+  return <>
+    <div>
+      <span className="hello" ref={rainbowEl}>
+        {exclamify('Hello, world')}
+      </span>
+      &nbsp;
+      <span className="color-info" ref={colorEl} />
+    </div>
     <style jsx>{`
       .hello {
         font-size: 2em;
         animation: rainbow 10s linear infinite;
+      }
+
+      .color-info {
+        font-family: monospace;
+        vertical-align: top;
       }
 
       @keyframes rainbow {
@@ -63,5 +91,34 @@ export function HelloPage() {
         100% { color: red; }
       }
     `}</style>
+  </>;
+}
+
+export function HelloPage() {
+  return <div>
+    <Head>
+      <title>Hello, world!</title>
+    </Head>
+    <HelloWorld />
+    <p>
+      Welcome to iczero's homepage. There's a few things here.
+    </p>
+    <p>
+      This is a Single-File Application. Not only is it single-page, it is also
+      a self-contained HTML file containing nothing except one script tag. It is
+      powered by React.
+    </p>
+    <p>
+      Click for cryptographically secure random values (copied to clipboard):
+      <br />
+      <KeccakButton />
+    </p>
+    <div>
+      <p>Links to other pages:</p>
+      <ul>
+        <li><Link to="/test">Test page</Link></li>
+        <li><Link to="/arx-derp">Bad random numbers</Link></li>
+      </ul>
+    </div>
   </div>;
 }

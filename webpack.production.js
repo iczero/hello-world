@@ -5,7 +5,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 const OUTPUT_FILENAME = 'output.html';
 
 module.exports = {
-  entry: './src/index.tsx',
+  entry: './src/initialize.tsx',
   mode: 'production',
   optimization: {
     minimize: true,
