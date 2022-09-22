@@ -474,6 +474,8 @@ export class KeccakRand extends KeccakWritable {
   public _bufferIndex = -1;
   /** If specified, max lifetime of buffered bytes */
   // public bufferTimeout: number | null = null;
+  /** If specified, will be called when entropy is added */
+  public onNewEntropy: (() => any) | null = null;
 
   /**
    * The constructor
@@ -505,6 +507,7 @@ export class KeccakRand extends KeccakWritable {
   onWritableFlush() {
     // drop buffer when keccak is updated
     this.dropBuffer();
+    if (this.onNewEntropy) this.onNewEntropy();
   }
 
   /**

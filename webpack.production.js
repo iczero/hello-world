@@ -34,7 +34,8 @@ module.exports = {
   },
   plugins: [
     new ProvidePlugin({
-      process: 'process/browser'
+      process: 'process/browser',
+      Buffer: ['buffer', 'Buffer']
     }),
     {
       // wrap output in script tags
