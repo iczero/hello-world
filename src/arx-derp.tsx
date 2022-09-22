@@ -1,4 +1,5 @@
 import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
+import { keccakRand } from './keccak-container';
 
 function u8RotateLeft(a: number, n: number): number {
   a &= 0xff; // ensure value in range
@@ -54,10 +55,9 @@ class BadRandom {
   }
 }
 
-function seedFromCryptoAPI(): number {
-  let v = new Uint32Array(1);
-  window.crypto.getRandomValues(v);
-  return v[0];
+function seedFromKeccak(): number {
+  let buf = keccakRand.bytes(4);
+  return buf.readUInt32LE();
 }
 
 class RandomBitWrapper {
@@ -91,7 +91,7 @@ export function ARXDerp() {
   let [calculatedPeriod, setCalculatedPeriod] = useState(0);
   let [manualSeed, setManualSeed] = useState('');
   useLayoutEffect(() => {
-    rng.current = new BadRandom(seedFromCryptoAPI());
+    rng.current = new BadRandom(seedFromKeccak());
     setRngCurrent(rng.current.getState());
   }, []);
 
@@ -146,7 +146,7 @@ export function ARXDerp() {
   }
 
   function reseed() {
-    rng.current!.seed(seedFromCryptoAPI());
+    rng.current!.seed(seedFromKeccak());
     setRngCurrent(rng.current!.getState());
   }
 

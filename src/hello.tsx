@@ -55,12 +55,13 @@ export function HelloWorld() {
 
       @keyframes rainbow {
         0% { color: red; }
-        14.28% { color: orange; }
-        28.57% { color: yellow; }
-        42.86% { color: lime; }
-        57.14% { color: blue; }
-        71.43% { color: indigo; }
-        85.71% { color: violet; }
+        12.5% { color: orange; }
+        25% { color: yellow; }
+        37.5% { color: lime; }
+        50% { color: aqua; }
+        62.5% { color: blue; }
+        75% { color: indigo; }
+        87.5% { color: darkviolet; }
         100% { color: red; }
       }
     `}</style>
