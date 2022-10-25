@@ -5,6 +5,9 @@ import { onReady } from './ready';
 
 export let keccak = new Keccak(12);
 export let keccakRand = new KeccakRand(keccak, 1024);
+// allow usage from browser console
+// @ts-expect-error
+globalThis.keccakRand = keccakRand;
 
 let newEntropyListeners: Set<() => void> = new Set();
 export function addEntropyListener(fn: () => void) {
