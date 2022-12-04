@@ -37,9 +37,28 @@ export async function initializePage() {
   appEl.id = 'react-root';
   document.body.appendChild(appEl);
 
-  // create react root and attach
-  let root = ReactDOMClient.createRoot(appEl);
-  root.render(<Root />);
+  let didRenderRoot = false;
+  let renderRoot = () => {
+    if (didRenderRoot) return;
+    didRenderRoot = true;
+    // create react root and attach
+    let root = ReactDOMClient.createRoot(appEl);
+    root.render(<Root />);
+  };
+  // determine if we are in a zero-sized frame
+  if (window.innerWidth !== 0 || window.innerHeight !== 0) {
+    renderRoot();
+  } else {
+    let resizeListener = () => {
+      if (window.innerWidth > 0 || window.innerHeight > 0) {
+        window.removeEventListener('resize', resizeListener);
+        console.log('window became visible, rendering root');
+        renderRoot();
+      }
+    };
+    // listen for resize events
+    window.addEventListener('resize', resizeListener);
+  }
 
   // fire ready handlers
   _doReady();

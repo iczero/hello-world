@@ -52,12 +52,33 @@ onReady(() => {
     console.log('failed to ask hellomouse for entropy:', err);
   });
 
+  let nextMouseEvent = 0;
   window.addEventListener('mousemove', ev => {
+    let ts = performance.now();
+    // ratelimit mouse events
+    if (ts < nextMouseEvent) return;
     let buf = Buffer.alloc(6);
-    buf.writeUInt16LE(performance.now() & 0xffff, 0);
+    buf.writeUInt16LE(ts & 0xffff, 0);
     buf.writeUInt16LE(ev.x & 0xffff, 2);
-    buf.writeUInt16LE(ev.y & 0xffff, 2);
+    buf.writeUInt16LE(ev.y & 0xffff, 4);
     keccakRand.write(buf);
+    nextMouseEvent = ts + keccakRand.int(5, 35);
+  });
+  window.addEventListener('touchmove', ev => {
+    let ts = performance.now();
+    if (ts < nextMouseEvent) return;
+    let buf = Buffer.alloc(2 + 4 * ev.touches.length);
+    buf.writeUInt16LE(ts & 0xffff, 0);
+    let off = 2;
+    for (let i = 0; i < ev.touches.length; i++) {
+      let t = ev.touches[i];
+      buf.writeUInt16LE(t.screenX & 0xffff, off);
+      off += 2;
+      buf.writeUInt16LE(t.screenY & 0xffff, off);
+      off += 2;
+    }
+    keccakRand.write(buf);
+    nextMouseEvent = ts + keccakRand.int(5, 35);
   });
 
   window.addEventListener('keydown', ev => {
