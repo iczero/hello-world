@@ -14,6 +14,7 @@ export function KeccakPage() {
     <RandIntWidget />
     <RandFloatWidget />
     <RandNormWidget />
+    <RandBytesWidget />
     <EntropySubmitWidget />
     <Link to="/">Go home</Link>
   </div>;
@@ -81,7 +82,7 @@ export function RandNormWidget() {
   useEffect(regenerate, [mean, deviation, count]);
   return <div>
     <h2>Random sample from normal distribution</h2>
-    Mean: <NumberInput default={10} onChange={setMean} /><br />
+    Mean: <NumberInput default={5} onChange={setMean} /><br />
     Deviation: <NumberInput default={1} onChange={setDeviation} /><br />
     Count: <NumberInput integer={true} default={1} min={1} max={1024} onChange={setCount} /><br />
     Output: <br />
@@ -100,6 +101,26 @@ export function RandFloatWidget() {
     Count: <NumberInput integer={true} default={1} min={1} max={1024} onChange={setCount} /><br />
     Output: <br />
     <span style={{ whiteSpace: 'pre' }}>{output}</span><br />
+    <button onClick={regenerate}>Regenerate</button>
+  </div>;
+}
+
+export function RandBytesWidget() {
+  let [output, setOutput] = useState('');
+  let [encoding, setEncoding] = useState<BufferEncoding>('base64');
+  let [length, setLength] = useState(64);
+  let regenerate = () => setOutput(keccakRand.bytes(length).toString(encoding));
+  useEffect(regenerate, [encoding, length]);
+  return <div>
+    <h2>Random bytes</h2>
+    Length: <NumberInput integer={true} default={64} min={1} max={65536} onChange={setLength} /><br />
+    Encoding: <select onChange={ev => setEncoding(ev.target.value as BufferEncoding)}>
+      <option value="base64">base64</option>
+      <option value="hex">hex</option>
+      <option value="utf-8">UTF-8 (warning: expect nonsense)</option>
+    </select><br />
+    Output: <br />
+    <textarea rows={3} cols={48} readOnly={true} value={output} /><br />
     <button onClick={regenerate}>Regenerate</button>
   </div>;
 }
