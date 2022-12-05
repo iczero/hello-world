@@ -93,6 +93,7 @@ export function HelloPage() {
       <p>Links to other pages:</p>
       <ul>
         <li><Link to="/test">Test page</Link></li>
+        <li><Link to="/keccak">Good random numbers</Link></li>
         <li><Link to="/arx-derp">Bad random numbers</Link></li>
       </ul>
     </div>

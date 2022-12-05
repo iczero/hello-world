@@ -130,6 +130,6 @@ export function KeccakSubmitButton() {
     setState('done');
   }
   return <button onClick={submit}>
-    {'Throw entropy at Hellomouse' + (state !== 'init' ? ': ' + state : '')}
+    {'Send/receive entropy to Hellomouse' + (state !== 'init' ? ': ' + state : '')}
   </button>;
 }

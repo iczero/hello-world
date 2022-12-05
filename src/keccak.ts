@@ -523,6 +523,7 @@ export class KeccakRand extends KeccakWritable {
       this.instance.absorbRaw(this.bitrate, buf);
     }
     this.dropBuffer();
+    if (this.onNewEntropy) this.onNewEntropy();
   }
 
   /**
