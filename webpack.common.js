@@ -1,20 +1,30 @@
 const { Compilation, ProvidePlugin } = require('webpack');
 const { ConcatSource, RawSource } = require('webpack-sources');
+const TerserPlugin = require('terser-webpack-plugin');
 
-module.exports = (outputName, spaceTags) => ({
+module.exports = (outputName, production) => ({
   entry: './src/initialize.tsx',
-  mode: 'development',
-  devtool: 'source-map',
+  mode: production ? 'development' : 'production',
+  // sourcemaps don't work; generated code is readable anyawys
+  devtool: false,
+  optimization: {
+    minimize: production,
+    minimizer: production
+      ? [new TerserPlugin({
+        test: /.*/,
+        parallel: true,
+        extractComments: {
+          banner: false
+        }
+      })]
+      : []
+  },
   module: {
     rules: [
       {
         test: /\.[jt]sx?$/,
         exclude: /node_modules/,
         loader: 'babel-loader'
-      },
-      {
-        test: /\.txt/,
-        type: 'asset/source'
       }
     ]
   },
@@ -43,10 +53,10 @@ module.exports = (outputName, spaceTags) => ({
               const source = new ConcatSource();
               // unicode BOM to ensure UTF-8 encoding
               source.add(new RawSource(Buffer.from([0xef, 0xbb, 0xbf])));
-              if (spaceTags) source.add('<script>\n');
+              if (!production) source.add('<script>\n');
               else source.add('<script>');
               source.add(compilation.assets[outputName]);
-              if (spaceTags) source.add('\n</script>\n');
+              if (!production) source.add('\n</script>\n');
               else source.add('</script>');
               compilation.assets[outputName] = source;
             }

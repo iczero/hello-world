@@ -1,1 +1,1 @@
-module.exports = require('./webpack.common.js')('output-dev.html', true);
+module.exports = require('./webpack.common.js')('output-dev.html', false);

@@ -5,8 +5,6 @@ import { HelloPage } from './hello';
 import { YayPage } from './yay';
 import { ARXDerp } from './arx-derp';
 import { KeccakPage } from './keccak-page';
-// TODO: css loader or something in webpack for automatic minification
-import normalizeCss from './assets/normalize.css.txt';
 
 export default () => <>
   <Head>
@@ -20,8 +18,9 @@ export default () => <>
       <Route path="/arx-derp" element={<ARXDerp />} />
     </Routes>
   </HashRouter>
-  <style jsx global>{normalizeCss}</style>
   <style jsx global>{`
+    @use 'third-party/normalize.css';
+
     body {
       font-family: sans-serif;
       margin: 0.5rem;

@@ -89,8 +89,8 @@ onReady(() => {
   });
 });
 
-export function getRandomString() {
-  return keccakRand.bytes(64).toString('hex');
+export function getRandomString(length = 16) {
+  return keccakRand.bytes(length).toString('hex');
 }
 
 export function useSubscribeEntropy(fn: () => any) {
@@ -100,15 +100,17 @@ export function useSubscribeEntropy(fn: () => any) {
   }, []);
 }
 
-export function KeccakButton() {
-  let [randVal, setRandVal] = useState(getRandomString);
+export function KeccakButton(props: { length?: number }) {
+  let [randVal, setRandVal] = useState('');
   function refresh() {
-    let val = getRandomString();
+    let val = getRandomString(props.length);
     setRandVal(val);
     return val;
   }
+  useEffect(() => void refresh(), [props.length]);
   function buttonClicked() {
-    navigator.clipboard?.writeText(refresh());
+    let out = refresh();
+    navigator.clipboard?.writeText(out);
   }
   useSubscribeEntropy(refresh);
   return <button onClick={buttonClicked}>
