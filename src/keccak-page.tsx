@@ -120,7 +120,8 @@ export function RandBytesWidget() {
       <option value="utf-8">UTF-8 (warning: expect nonsense)</option>
     </select><br />
     Output: <br />
-    <textarea rows={3} cols={48} readOnly={true} value={output} /><br />
+    <textarea style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}
+      rows={3} cols={48} readOnly={true} value={output} /><br />
     <button onClick={regenerate}>Regenerate</button>
   </div>;
 }
