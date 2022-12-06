@@ -5,7 +5,7 @@ import { Head, NumberInput } from '../util';
 
 export function KeccakPage() {
   return <div>
-    <Head>KeccakRand™</Head>
+    <Head><title>KeccakRand™</title></Head>
     <div>
       <KeccakButton />
       <br />

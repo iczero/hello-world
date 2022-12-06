@@ -152,7 +152,7 @@ export function ARXDerp() {
   }
 
   return <div>
-    <Head>ARX permutation test</Head>
+    <Head><title>ARX permutation test</title></Head>
     <div>
       <button onClick={() => setRngCurrent(rng.current!.next())}>
         <pre>{rngCurrent}</pre>

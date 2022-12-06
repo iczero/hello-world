@@ -29,7 +29,7 @@ export function FakerPage() {
     setLoaded(true);
   })(), []);
   return <>
-    <Head>Faker.js generator</Head>
+    <Head><title>Faker.js generator</title></Head>
     <h2>Faker.js generator</h2>
     {loaded
       ? <FakerList faker={f.current!} />
@@ -50,13 +50,15 @@ export function FakerEntry({ fn, name }: { fn: () => any; name: string }) {
 
 export function FakerList({ faker }: { faker: Faker }) {
   return <table>
-    <FakerEntry name="Name" fn={faker.name.fullName} />
-    <FakerEntry name="Address" fn={faker.address.streetAddress} />
-    <FakerEntry name="Birthday" fn={() => faker.date.birthdate().toDateString()} />
-    <FakerEntry name="Email" fn={faker.internet.email} />
-    <FakerEntry name="Password" fn={faker.internet.password} />
-    <FakerEntry name="Job title" fn={faker.name.jobTitle} />
-    <FakerEntry name="Company" fn={faker.company.name} />
-    <FakerEntry name="BS" fn={faker.company.bs} />
+    <tbody>
+      <FakerEntry name="Name" fn={faker.name.fullName} />
+      <FakerEntry name="Address" fn={faker.address.streetAddress} />
+      <FakerEntry name="Birthday" fn={() => faker.date.birthdate().toDateString()} />
+      <FakerEntry name="Email" fn={faker.internet.email} />
+      <FakerEntry name="Password" fn={faker.internet.password} />
+      <FakerEntry name="Job title" fn={faker.name.jobTitle} />
+      <FakerEntry name="Company" fn={faker.company.name} />
+      <FakerEntry name="BS" fn={faker.company.bs} />
+    </tbody>
   </table>;
 }
