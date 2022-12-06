@@ -93,9 +93,13 @@ export function HelloPage() {
       <p>Links to other pages:</p>
       <ul>
         <li><Link to="/test">Test page</Link></li>
-        <li><Link to="/keccak">Good random numbers</Link></li>
+        <li><Link to="/keccak">Good random numbers (keccak)</Link></li>
         <li><Link to="/arx-derp">Bad random numbers</Link></li>
       </ul>
     </div>
+    <p>
+      Source: <a href="https://github.com/iczero/hello-world">
+        https://github.com/iczero/hello-world</a>
+    </p>
   </div>;
 }

@@ -18,13 +18,6 @@ export default () => <>
       <Route path="/arx-derp" element={<ARXDerp />} />
     </Routes>
   </HashRouter>
-  <style jsx global>{`
-    @use 'third-party/normalize.css';
-
-    body {
-      font-family: sans-serif;
-      margin: 0.5rem;
-      line-height: 1.5;
-    }
-  `}</style>
+  <style jsx global>{`@use 'third-party/normalize.css'`}</style>
+  <style jsx global>{`@use 'global.scss'`}</style>
 </>;
