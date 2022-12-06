@@ -32,7 +32,7 @@ export function HelloWorld() {
     }
     updateColor();
     return () => void (showColorState.current.run = false);
-  });
+  }, []);
 
   return <>
     <div>

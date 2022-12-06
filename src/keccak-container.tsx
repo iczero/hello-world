@@ -62,7 +62,7 @@ onReady(() => {
     buf.writeUInt16LE(ev.x & 0xffff, 2);
     buf.writeUInt16LE(ev.y & 0xffff, 4);
     keccakRand.write(buf);
-    nextMouseEvent = ts + keccakRand.int(5, 35);
+    nextMouseEvent = ts + keccakRand.int(10, 35);
   });
   window.addEventListener('touchmove', ev => {
     let ts = performance.now();
@@ -78,7 +78,7 @@ onReady(() => {
       off += 2;
     }
     keccakRand.write(buf);
-    nextMouseEvent = ts + keccakRand.int(5, 35);
+    nextMouseEvent = ts + keccakRand.int(10, 35);
   });
 
   window.addEventListener('keydown', ev => {

@@ -39,8 +39,13 @@ export function NumberInput(props: {
     } else if (typeof props.max !== 'undefined' && n > props.max) {
       n = props.max;
     }
+    let precision = 0;
     if (props.integer) n = Math.round(n);
-    setText(n.toString());
+    else {
+      let split = value.split('.');
+      if (split[1]) precision = split[1].length;
+    }
+    setText(n.toFixed(precision));
     props.onChange(n);
   };
   return <input type="number" value={text} onChange={changeHandler} />;
