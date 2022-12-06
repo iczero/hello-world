@@ -43,7 +43,7 @@ export function NumberInput(props: {
     if (props.integer) n = Math.round(n);
     else {
       let split = value.split('.');
-      if (split[1]) precision = split[1].length;
+      if (split[1]) precision = Math.min(split[1].length, 100);
     }
     setText(n.toFixed(precision));
     props.onChange(n);
