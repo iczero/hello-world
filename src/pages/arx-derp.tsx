@@ -1,5 +1,6 @@
 import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
-import { keccakRand } from './keccak-container';
+import { keccakRand } from '../keccak-container';
+import { Head } from '../util';
 
 function u8RotateLeft(a: number, n: number): number {
   a &= 0xff; // ensure value in range
@@ -151,6 +152,7 @@ export function ARXDerp() {
   }
 
   return <div>
+    <Head>ARX permutation test</Head>
     <div>
       <button onClick={() => setRngCurrent(rng.current!.next())}>
         <pre>{rngCurrent}</pre>

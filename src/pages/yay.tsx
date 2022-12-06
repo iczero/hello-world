@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Head } from './util';
+import { Head } from '../util';
 
 export function YayPage() {
   return <div>

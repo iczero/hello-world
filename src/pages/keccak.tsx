@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { KeccakButton, keccakRand, KeccakSubmitButton } from './keccak-container';
-import { NumberInput } from './util';
+import { KeccakButton, keccakRand, KeccakSubmitButton } from '../keccak-container';
+import { Head, NumberInput } from '../util';
 
 export function KeccakPage() {
   return <div>
+    <Head>KeccakRand™</Head>
     <div>
       <KeccakButton />
       <br />
@@ -13,6 +14,7 @@ export function KeccakPage() {
     <CoinFlipWidget />
     <RandIntWidget />
     <RandFloatWidget />
+    <RandColorWidget />
     <RandNormWidget />
     <RandBytesWidget />
     <EntropySubmitWidget />
@@ -122,6 +124,27 @@ export function RandBytesWidget() {
     Output: <br />
     <textarea style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}
       rows={3} cols={48} readOnly={true} value={output} /><br />
+    <button onClick={regenerate}>Regenerate</button>
+  </div>;
+}
+
+export function RandColorWidget() {
+  let canvas = useRef<HTMLCanvasElement>(null);
+  let [color, setColor] = useState('canvas error?');
+  let regenerate = () => {
+    let cv = canvas.current!;
+    let ctx = cv.getContext('2d');
+    if (!ctx) return;
+    let col = '#' + keccakRand.bytes(3).toString('hex');
+    ctx.fillStyle = col;
+    ctx?.fillRect(0, 0, cv.width, cv.height);
+    setColor(col);
+  };
+  useEffect(regenerate, []);
+  return <div>
+    <h2>Random color</h2>
+    <canvas width={64} height={64} ref={canvas} />
+    <pre style={{ margin: 0 }}>{color}</pre>
     <button onClick={regenerate}>Regenerate</button>
   </div>;
 }

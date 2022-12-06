@@ -1,7 +1,7 @@
 import React, { MutableRefObject, useEffect, useRef } from 'react';
-import { KeccakButton, KeccakSubmitButton } from './keccak-container';
+import { KeccakButton, KeccakSubmitButton } from '../keccak-container';
 import { Link } from 'react-router-dom';
-import { Head } from './util';
+import { Head } from '../util';
 
 export function exclamify(a: string): string {
   return a + '!';
@@ -95,6 +95,7 @@ export function HelloPage() {
         <li><Link to="/test">Test page</Link></li>
         <li><Link to="/keccak">Good random numbers (keccak)</Link></li>
         <li><Link to="/arx-derp">Bad random numbers</Link></li>
+        <li><Link to="/fakerjs">Faker.js thing</Link></li>
       </ul>
     </div>
     <p>
