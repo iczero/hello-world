@@ -45,13 +45,18 @@ export function RandIntWidget() {
   let regenerate = () => {
     let [nmin, nmax] = [min, max];
     if (nmax < nmin) [nmin, nmax] = [nmax, nmin];
-    setOutput(keccakRand.intMany(count, nmin, nmax + 1).join(', '));
+    try {
+      setOutput(keccakRand.intMany(count, nmin, nmax + 1).join(', '));
+    } catch (err) {
+      setOutput('Error: range is too large');
+    }
   };
   useEffect(regenerate, [min, max, count]);
+  const MAX = Number.MAX_SAFE_INTEGER - 1;
   return <div>
     <h2>Random integer</h2>
-    Min: <NumberInput integer={true} default={1} onChange={setMin} /><br />
-    Max: <NumberInput integer={true} default={6} onChange={setMax} /><br />
+    Min: <NumberInput integer={true} default={1} min={-MAX} max={MAX} onChange={setMin} /><br />
+    Max: <NumberInput integer={true} default={6} min={-MAX} max={MAX} onChange={setMax} /><br />
     Count: <NumberInput integer={true} default={1} min={1} max={1024} onChange={setCount} /><br />
     Output: {output}<br />
     <button onClick={regenerate}>Regenerate</button>
