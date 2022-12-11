@@ -92,7 +92,7 @@ export function HelloPage() {
     <div>
       <p>Links to other pages:</p>
       <ul>
-        <li><Link to="/test">Test page</Link></li>
+        <li><Link to="/yay">Test page</Link></li>
         <li><Link to="/keccak">Good random numbers (keccak)</Link></li>
         <li><Link to="/arx-derp">Bad random numbers</Link></li>
         <li><Link to="/fakerjs">Faker.js thing</Link></li>

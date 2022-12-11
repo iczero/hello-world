@@ -15,11 +15,11 @@ export async function initializePage() {
   // totally sane function, yes
   console.log('Hello, world!');
 
+  // grab ourself
+  let selfScript = document.currentScript;
+
   // wait for script to finish loading
   await contentLoaded;
-
-  // grab ourself
-  let selfScript = document.getElementsByTagName('script')[0];
 
   // replace document
   document.open();
@@ -27,7 +27,7 @@ export async function initializePage() {
   document.close();
 
   // attach ourself to new document (not actually needed, but fun)
-  document.head.appendChild(selfScript);
+  if (selfScript) document.head.appendChild(selfScript);
 
   // create body
   let body = document.createElement('body');

@@ -12,6 +12,7 @@ export function YayPage() {
     <style jsx>{`
       .yay {
         font-size: 3em;
+        padding-left: 1em;
       }
     `}</style>
   </div>;
