@@ -23,10 +23,15 @@ export async function getFaker() {
 
 export function FakerPage() {
   let [loaded, setLoaded] = useState(false);
+  let [error, setError] = useState<string | null>(null);
   let f = useRef<Faker | null>(null);
   useEffect(() => void (async () => {
-    f.current = await getFaker();
-    setLoaded(true);
+    try {
+      f.current = await getFaker();
+      setLoaded(true);
+    } catch (err: any) {
+      setError(err.stack);
+    }
   })(), []);
   return <>
     <Head><title>Faker.js generator</title></Head>
@@ -34,6 +39,9 @@ export function FakerPage() {
     {loaded
       ? <FakerList faker={f.current!} />
       : <p>Loading. Please be patient, this may take a very long time</p>}
+    {error
+      ? <p>Error loading Faker.js from Skypack.<pre>{error}</pre></p>
+      : null}
     <p><a href="https://github.com/faker-js/faker">Faker.js on GitHub</a></p>
     <Link to="/">Go home</Link>
   </>;
