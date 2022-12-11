@@ -1,4 +1,4 @@
-# Hello world but it's a ~250 kB HTML file consisting of purely JavaScript
+# Hello world but it's a ~515 kB HTML file consisting of purely JavaScript
 
 If it wasn't obvious already, this is a joke
 
