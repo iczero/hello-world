@@ -21,22 +21,29 @@ export async function initializePage() {
   // wait for script to finish loading
   await contentLoaded;
 
-  // replace document
-  document.open();
-  document.write('<!DOCTYPE html>'); // quirks mode be gone
-  document.close();
+  if (document.compatMode !== 'CSS1Compat') {
+    // replace document
+    document.open();
+    document.write('<!DOCTYPE html>'); // quirks mode be gone
+    document.close();
 
-  // attach ourself to new document (not actually needed, but fun)
-  if (selfScript) document.head.appendChild(selfScript);
+    // attach ourself to new document (not actually needed, but fun)
+    if (selfScript) document.head.appendChild(selfScript);
 
-  // create body
-  let body = document.createElement('body');
-  document.body = body;
+    // create body
+    let body = document.createElement('body');
+    document.body = body;
+  }
+
   // create react root element
   let appEl = document.createElement('div');
   appEl.id = 'react-root';
   document.body.appendChild(appEl);
 
+  // fire ready handlers
+  _doReady();
+
+  // prepare to render root
   let didRenderRoot = false;
   let renderRoot = () => {
     if (didRenderRoot) return;
@@ -59,9 +66,6 @@ export async function initializePage() {
     // listen for resize events
     window.addEventListener('resize', resizeListener);
   }
-
-  // fire ready handlers
-  _doReady();
 }
 
 initializePage();

@@ -53,7 +53,7 @@ module.exports = (outputName, production) => ({
               const source = new ConcatSource();
               // unicode BOM to ensure UTF-8 encoding
               source.add(new RawSource(Buffer.from([0xef, 0xbb, 0xbf])));
-              if (!production) source.add('<script>\n');
+              if (!production) source.add('<!doctype html>\n<script>\n');
               else source.add('<script>');
               source.add(compilation.assets[outputName]);
               if (!production) source.add('\n</script>\n');
