@@ -1,7 +1,6 @@
 import { _doReady } from './ready';
-import React from 'react';
 import ReactDOMClient from 'react-dom/client';
-import Root from './root';
+import createRoot from './root';
 
 export function waitEvent(target: EventTarget, event: string) {
   return new Promise(resolve => {
@@ -21,6 +20,7 @@ export async function initializePage() {
   // wait for script to finish loading
   await contentLoaded;
 
+  // get rid of quirks mode if currently in quirks mode
   if (document.compatMode !== 'CSS1Compat') {
     // replace document
     document.open();
@@ -40,9 +40,6 @@ export async function initializePage() {
   appEl.id = 'react-root';
   document.body.appendChild(appEl);
 
-  // fire ready handlers
-  _doReady();
-
   // prepare to render root
   let didRenderRoot = false;
   let renderRoot = () => {
@@ -50,7 +47,7 @@ export async function initializePage() {
     didRenderRoot = true;
     // create react root and attach
     let root = ReactDOMClient.createRoot(appEl);
-    root.render(<Root />);
+    root.render(createRoot());
   };
   // determine if we are in a zero-sized frame
   if (window.innerWidth !== 0 || window.innerHeight !== 0) {
@@ -66,6 +63,9 @@ export async function initializePage() {
     // listen for resize events
     window.addEventListener('resize', resizeListener);
   }
+
+  // fire ready handlers
+  _doReady();
 }
 
 initializePage();

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import {
   Link, useNavigate, RouterProvider, createHashRouter, Outlet, useLocation,
   useRouteError
@@ -9,10 +9,12 @@ import { YayPage } from './pages/yay';
 import { ARXDerp } from './pages/arx-derp';
 import { KeccakPage } from './pages/keccak';
 import { FakerPage } from './pages/fakerjs';
+import { Router } from '@remix-run/router';
 
 export function UnknownRoute() {
   let navigate = useNavigate();
   return <div>
+    <Head><title>how did you get here</title></Head>
     <p>Unknown route!</p>
     <p>
       <button onClick={() => navigate(-1)}>Go back</button>{' '}
@@ -54,12 +56,26 @@ export function AppRoot() {
   return <Outlet />;
 }
 
-export default () => {
-  // Before you ask "why is this in the component", please consider that this
+function Root({ router }: { router: Router }) {
+  // dispose router if element gone
+  useEffect(() => () => router.dispose(), []);
+
+  return <React.StrictMode>
+    <Head>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </Head>
+    <RouterProvider router={router} />
+    <style jsx global>{`@use 'third-party/normalize.css'`}</style>
+    <style jsx global>{`@use 'global.scss'`}</style>
+  </React.StrictMode>;
+}
+
+export default function createRoot() {
+  // Before you ask "why is this here of all places", please consider that this
   // app is built in an extremely cursed manner. Modules are loaded *before* the
   // page actually exists, as it is replaced in order get rid of quirks mode.
   // In this process, all event handlers, including history, are discarded.
-  let router = useMemo(() => createHashRouter([
+  let router = createHashRouter([
     {
       path: '/',
       element: <AppRoot />,
@@ -91,14 +107,7 @@ export default () => {
         }
       ]
     }
-  ]), []);
+  ]);
 
-  return <React.StrictMode>
-    <Head>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    </Head>
-    <RouterProvider router={router} />
-    <style jsx global>{`@use 'third-party/normalize.css'`}</style>
-    <style jsx global>{`@use 'global.scss'`}</style>
-  </React.StrictMode>;
-};
+  return <Root router={router} />;
+}
