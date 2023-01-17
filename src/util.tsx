@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 export function Head(props: { children: React.ReactNode }) {
@@ -14,8 +14,13 @@ export function normalizeIntegerInput(value: string, min: number | null, max: nu
 }
 
 export function useForceUpdate() {
-  let [n, s] = useState(false);
-  return () => s(!n);
+  let [current, set] = useState(false);
+  return () => set(!current);
+}
+
+export function useMemoWithInvalidate<T>(factory: () => T, deps: React.DependencyList): [T, () => void, number] {
+  let [count, setCount] = useState(1);
+  return [useMemo(factory, [count, ...deps]), () => setCount(count => count + 1), count];
 }
 
 export function NumberInput(props: {

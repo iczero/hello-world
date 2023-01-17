@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { KeccakButton, keccakRand, KeccakSubmitButton } from '../keccak-container';
-import { Head, NumberInput } from '../util';
+import { Head, NumberInput, useMemoWithInvalidate } from '../util';
 
 export function KeccakPage() {
   return <div>
@@ -41,17 +41,15 @@ export function RandIntWidget() {
   let [min, setMin] = useState(1);
   let [max, setMax] = useState(6);
   let [count, setCount] = useState(1);
-  let [output, setOutput] = useState('');
-  let regenerate = () => {
+  let [output, regenerate] = useMemoWithInvalidate(() => {
     let [nmin, nmax] = [min, max];
     if (nmax < nmin) [nmin, nmax] = [nmax, nmin];
     try {
-      setOutput(keccakRand.intMany(count, nmin, nmax + 1).join(', '));
+      return keccakRand.intMany(count, nmin, nmax + 1).join(', ');
     } catch (err) {
-      setOutput('Error: range is too large');
+      return 'Error: range is too large';
     }
-  };
-  useEffect(regenerate, [min, max, count]);
+  }, [min, max, count]);
   const MAX = Number.MAX_SAFE_INTEGER - 1;
   return <div>
     <h2>Random integer</h2>
@@ -64,13 +62,9 @@ export function RandIntWidget() {
 }
 
 export function CoinFlipWidget() {
-  let [output, setOutput] = useState('');
-  let [times, setTimes] = useState(0);
-  let regenerate = () => {
-    setOutput(keccakRand.bool() ? 'Heads / Yes' : 'Tails / No');
-    setTimes(count => count + 1);
-  };
-  useEffect(regenerate, []);
+  let [output, regenerate, times] = useMemoWithInvalidate(() => {
+    return keccakRand.bool() ? 'Heads / Yes' : 'Tails / No';
+  }, []);
   return <div>
     <h2>Flip a coin</h2>
     Output [{times}]: {output}<br />
@@ -82,11 +76,10 @@ export function RandNormWidget() {
   let [mean, setMean] = useState(5);
   let [deviation, setDeviation] = useState(1);
   let [count, setCount] = useState(1);
-  let [output, setOutput] = useState('');
-  let regenerate = () => {
-    setOutput(keccakRand.normMany(count, mean, deviation).slice(0, count).join('\n'));
-  };
-  useEffect(regenerate, [mean, deviation, count]);
+  let [output, regenerate] = useMemoWithInvalidate(
+    () => keccakRand.normMany(count, mean, deviation).slice(0, count).join('\n'),
+    [mean, deviation, count]
+  );
   return <div>
     <h2>Random sample from normal distribution</h2>
     Mean: <NumberInput default={5} onChange={setMean} /><br />
@@ -99,10 +92,9 @@ export function RandNormWidget() {
 }
 
 export function RandFloatWidget() {
-  let [output, setOutput] = useState('');
   let [count, setCount] = useState(1);
-  let regenerate = () => setOutput(keccakRand.floatMany(count).join('\n').toString());
-  useEffect(regenerate, [count]);
+  let [output, regenerate] = useMemoWithInvalidate(
+    () => keccakRand.floatMany(count).join('\n').toString(), [count]);
   return <div>
     <h2>Random float (uniform distribution) from 0 to 1</h2>
     Count: <NumberInput integer={true} default={1} min={1} max={1024} onChange={setCount} /><br />
@@ -113,11 +105,10 @@ export function RandFloatWidget() {
 }
 
 export function RandBytesWidget() {
-  let [output, setOutput] = useState('');
   let [encoding, setEncoding] = useState<BufferEncoding>('base64');
   let [length, setLength] = useState(64);
-  let regenerate = () => setOutput(keccakRand.bytes(length).toString(encoding));
-  useEffect(regenerate, [encoding, length]);
+  let [output, regenerate] = useMemoWithInvalidate(
+    () => keccakRand.bytes(length).toString(encoding), [encoding, length]);
   return <div>
     <h2>Random bytes</h2>
     Length: <NumberInput integer={true} default={64} min={1} max={65536} onChange={setLength} /><br />
@@ -135,20 +126,26 @@ export function RandBytesWidget() {
 
 export function RandColorWidget() {
   let canvas = useRef<HTMLCanvasElement>(null);
-  let [color, setColor] = useState('canvas error?');
-  let regenerate = () => {
+  let [canvasError, setCanvasError] = useState('');
+  let [color, regenerate] = useMemoWithInvalidate(
+    () => '#' + keccakRand.bytes(3).toString('hex'), []);
+  useEffect(() => {
     let cv = canvas.current!;
     let ctx = cv.getContext('2d');
-    if (!ctx) return;
-    let col = '#' + keccakRand.bytes(3).toString('hex');
-    ctx.fillStyle = col;
+    if (!ctx) {
+      setCanvasError('canvas not working or unavailable');
+      return;
+    }
+    ctx.fillStyle = color;
     ctx?.fillRect(0, 0, cv.width, cv.height);
-    setColor(col);
-  };
-  useEffect(regenerate, []);
+  }, [color]);
   return <div>
     <h2>Random color</h2>
-    <canvas width={64} height={64} ref={canvas} />
+    {
+      canvasError === ''
+        ? <canvas width={64} height={64} ref={canvas} />
+        : <div>{canvasError}</div>
+    }
     <pre style={{ margin: 0 }}>{color}</pre>
     <button onClick={regenerate}>Regenerate</button>
   </div>;
