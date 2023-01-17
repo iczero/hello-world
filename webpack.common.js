@@ -4,7 +4,7 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = (outputName, production) => ({
   entry: './src/initialize.tsx',
-  mode: production ? 'development' : 'production',
+  mode: production ? 'production' : 'development',
   // sourcemaps don't work; generated code is readable anyawys
   devtool: false,
   optimization: {
