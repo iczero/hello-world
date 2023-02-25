@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useMemo, useState } from 'react';
+import React, { ChangeEvent, useMemo, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 export function Head(props: { children: React.ReactNode }) {
@@ -19,8 +19,16 @@ export function useForceUpdate() {
 }
 
 export function useMemoWithInvalidate<T>(factory: () => T, deps: React.DependencyList): [T, () => void, number] {
-  let [count, setCount] = useState(1);
-  return [useMemo(factory, [count, ...deps]), () => setCount(count => count + 1), count];
+  let [count, setCount] = useState(0);
+  let updateTracker = useRef(0);
+  return [
+    useMemo(() => {
+      updateTracker.current++;
+      return factory();
+    }, [count, ...deps]),
+    () => setCount(count => count + 1),
+    updateTracker.current
+  ];
 }
 
 export function NumberInput(props: {

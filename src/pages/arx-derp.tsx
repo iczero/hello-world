@@ -48,6 +48,8 @@ class BadRandom {
     sv.setUint8(1, sv.getUint8(1) ^ sv.getUint8(2));
     // rotate entire state right by 19
     sv.setUint32(0, u32RotateRight(sv.getUint32(0, le), 19), le);
+    // flip 8th bit
+    sv.setUint8(0, sv.getUint8(1) ^ 1);
   }
 
   next(): number {
@@ -116,7 +118,7 @@ export function ARXDerp() {
       for (let x = 0; x < width; x++) {
         // ImageData uses RGBA
         let pos = (width * y + x) * 4;
-        let value = Number(bitWrapper.next()) * 255;
+        let value = Number(!bitWrapper.next()) * 255;
         if (value) onesCount++;
         imageBuf[pos + 0] = value; // red
         imageBuf[pos + 1] = value; // green
@@ -197,6 +199,9 @@ export function ARXDerp() {
       <br />
       Frequency of ones: {onesFreq}
     </div>
-    <canvas ref={canvas} width={canvasWidth} height={canvasHeight} />
+    <canvas style={{
+      transform: 'scale(200%)',
+      transformOrigin: 'top left'
+    }} ref={canvas} width={canvasWidth} height={canvasHeight} />
   </div>;
 }
