@@ -1,6 +1,6 @@
 import React, { useState, useRef, useLayoutEffect, useEffect } from 'react';
 import { keccakRand } from '../keccak-container';
-import { Head } from '../util';
+import { Head, sleep } from '../util';
 
 function u8RotateLeft(a: number, n: number): number {
   a &= 0xff; // ensure value in range
@@ -89,7 +89,7 @@ export function ARXDerp() {
   let [canvasHeight, setCanvasHeight] = useState(CANVAS_DEFAULT_HEIGHT);
   let [rngCurrent, setRngCurrent] = useState<number | string>(0);
   let [onesFreq, setOnesFreq] = useState(0);
-  let [calculatedPeriod, setCalculatedPeriod] = useState(0);
+  let [calculatedPeriod, setCalculatedPeriod] = useState('0');
   let [manualSeed, setManualSeed] = useState('');
   useLayoutEffect(() => {
     rng.current = new BadRandom(seedFromKeccak());
@@ -131,19 +131,34 @@ export function ARXDerp() {
 
   useEffect(() => refreshCanvas(), [canvasWidth, canvasHeight]);
 
-  function calculatePeriod() {
+  async function calculatePeriod() {
+    const INTERVAL = 1000 / 15;
+    const BATCH = 1024;
     let gen = rng.current!;
     let period = 0;
-    let seen = new Uint8Array(2 ** 32 - 1);
-    while (true) {
-      let val = gen.next();
-      let idx = Math.floor(val / 8);
-      let bit = val & 8;
-      if (seen[idx] & (1 << bit)) break;
-      seen[idx] |= 1 << bit;
-      period++;
+    let seen = new Uint8Array(2 ** 32 / 8);
+    let rate = 0;
+    function update(period: number, rate: number) {
+      setCalculatedPeriod(`${period}, ${rate.toFixed(0)} it/s`);
     }
-    setCalculatedPeriod(period);
+    outer: while (true) {
+      let start = performance.now();
+      let startIndex = period;
+      while (performance.now() - start < INTERVAL) {
+        for (let i = 0; i < BATCH; i++) {
+          let val = gen.next();
+          let idx = val >>> 3;
+          let bit = val & 7;
+          if (seen[idx] & (1 << bit)) break outer;
+          seen[idx] |= 1 << bit;
+          period++;
+        }
+      }
+      rate = (period - startIndex) / (performance.now() - start) * 1000;
+      update(period, rate);
+      await sleep();
+    }
+    update(period, rate);
   }
 
   function reseed() {
@@ -164,7 +179,7 @@ export function ARXDerp() {
       </button>
       <button onClick={() => refreshCanvas()}>Refresh canvas</button>
       <br />
-      <button onClick={() => calculatePeriod()}>{'Calculate period: ' + calculatedPeriod}</button>
+      <button onClick={() => calculatePeriod()}>Calculate period: <code>{calculatedPeriod}</code></button>
       <button onClick={() => reseed()}>Reseed</button>
     </div>
     <div>

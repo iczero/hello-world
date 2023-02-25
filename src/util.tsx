@@ -55,3 +55,7 @@ export function NumberInput(props: {
   };
   return <input type="number" value={text} onChange={changeHandler} />;
 }
+
+export function sleep(t = 0): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, t));
+}
