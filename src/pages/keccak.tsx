@@ -41,7 +41,7 @@ export function RandIntWidget() {
   let [min, setMin] = useState(1);
   let [max, setMax] = useState(6);
   let [count, setCount] = useState(1);
-  let [output, regenerate] = useMemoWithInvalidate(() => {
+  let [output, regenerate, times] = useMemoWithInvalidate(() => {
     let [nmin, nmax] = [min, max];
     if (nmax < nmin) [nmin, nmax] = [nmax, nmin];
     try {
@@ -56,7 +56,7 @@ export function RandIntWidget() {
     Min: <NumberInput integer={true} default={1} min={-MAX} max={MAX} onChange={setMin} /><br />
     Max: <NumberInput integer={true} default={6} min={-MAX} max={MAX} onChange={setMax} /><br />
     Count: <NumberInput integer={true} default={1} min={1} max={1024} onChange={setCount} /><br />
-    Output: {output}<br />
+    Output [{times}]: {output}<br />
     <button onClick={regenerate}>Regenerate</button>
   </div>;
 }
@@ -76,7 +76,7 @@ export function RandNormWidget() {
   let [mean, setMean] = useState(5);
   let [deviation, setDeviation] = useState(1);
   let [count, setCount] = useState(1);
-  let [output, regenerate] = useMemoWithInvalidate(
+  let [output, regenerate, times] = useMemoWithInvalidate(
     () => keccakRand.normMany(count, mean, deviation).slice(0, count).join('\n'),
     [mean, deviation, count]
   );
@@ -85,7 +85,7 @@ export function RandNormWidget() {
     Mean: <NumberInput default={5} onChange={setMean} /><br />
     Deviation: <NumberInput default={1} onChange={setDeviation} /><br />
     Count: <NumberInput integer={true} default={1} min={1} max={1024} onChange={setCount} /><br />
-    Output: <br />
+    Output [{times}]: <br />
     <span style={{ whiteSpace: 'pre' }}>{output}</span><br />
     <button onClick={regenerate}>Regenerate</button>
   </div>;
@@ -93,12 +93,12 @@ export function RandNormWidget() {
 
 export function RandFloatWidget() {
   let [count, setCount] = useState(1);
-  let [output, regenerate] = useMemoWithInvalidate(
+  let [output, regenerate, times] = useMemoWithInvalidate(
     () => keccakRand.floatMany(count).join('\n').toString(), [count]);
   return <div>
     <h2>Random float (uniform distribution) from 0 to 1</h2>
     Count: <NumberInput integer={true} default={1} min={1} max={1024} onChange={setCount} /><br />
-    Output: <br />
+    Output [{times}]: <br />
     <span style={{ whiteSpace: 'pre' }}>{output}</span><br />
     <button onClick={regenerate}>Regenerate</button>
   </div>;
@@ -107,7 +107,7 @@ export function RandFloatWidget() {
 export function RandBytesWidget() {
   let [encoding, setEncoding] = useState<BufferEncoding>('base64');
   let [length, setLength] = useState(64);
-  let [output, regenerate] = useMemoWithInvalidate(
+  let [output, regenerate, times] = useMemoWithInvalidate(
     () => keccakRand.bytes(length).toString(encoding), [encoding, length]);
   return <div>
     <h2>Random bytes</h2>
@@ -117,7 +117,7 @@ export function RandBytesWidget() {
       <option value="hex">hex</option>
       <option value="utf-8">UTF-8 (warning: expect nonsense)</option>
     </select><br />
-    Output: <br />
+    Output [{times}]: <br />
     <textarea style={{ fontFamily: 'monospace', wordBreak: 'break-all' }}
       rows={3} cols={48} readOnly={true} value={output} /><br />
     <button onClick={regenerate}>Regenerate</button>
@@ -127,7 +127,7 @@ export function RandBytesWidget() {
 export function RandColorWidget() {
   let canvas = useRef<HTMLCanvasElement>(null);
   let [canvasError, setCanvasError] = useState('');
-  let [color, regenerate] = useMemoWithInvalidate(
+  let [color, regenerate, times] = useMemoWithInvalidate(
     () => '#' + keccakRand.bytes(3).toString('hex'), []);
   useEffect(() => {
     let cv = canvas.current!;
@@ -146,7 +146,8 @@ export function RandColorWidget() {
         ? <canvas width={64} height={64} ref={canvas} />
         : <div>{canvasError}</div>
     }
-    <pre style={{ margin: 0 }}>{color}</pre>
+    <br />
+    Output [{times}]: <code>{color}</code><br />
     <button onClick={regenerate}>Regenerate</button>
   </div>;
 }
