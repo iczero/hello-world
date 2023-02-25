@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: lts/*
           cache: npm
-      - run: npm install
+      - run: npm ci
       - run: npm run build:prod
       - run: |
           mv dist/output.html dist/index.html
