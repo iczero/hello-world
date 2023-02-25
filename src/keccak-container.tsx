@@ -128,8 +128,12 @@ export function KeccakSubmitButton() {
     if (state === 'sending') return;
     setState('sending');
     reseed(64);
-    await throwHellomouse();
-    setState('done');
+    try {
+      await throwHellomouse();
+      setState('done');
+    } catch (err) {
+      setState('error');
+    }
   }
   return <button onClick={submit}>
     {'Send/receive entropy to Hellomouse' + (state !== 'init' ? ': ' + state : '')}
