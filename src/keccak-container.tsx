@@ -34,11 +34,10 @@ export async function throwHellomouse(get = true, send = true) {
   }
 }
 
-export function reseed() {
-  let buf = Buffer.alloc(256);
+export function reseed(n = 256) {
+  let buf = Buffer.alloc(n);
   window.crypto.getRandomValues(buf);
   keccakRand.seedDirect(buf);
-  console.log('keccak reseeded');
 }
 
 reseed();
@@ -128,6 +127,7 @@ export function KeccakSubmitButton() {
   async function submit() {
     if (state === 'sending') return;
     setState('sending');
+    reseed(64);
     await throwHellomouse();
     setState('done');
   }
