@@ -225,8 +225,8 @@ export class KeccakWritable extends stream.Writable {
       } else {
         // write remaining bytes back to buffer
         let excess = bufferedLength % this.byterate;
-        writeBuf = Buffer.concat([...this._writableBuffer, chunk.slice(0, chunk.length - excess)]);
-        this._writableBuffer = [chunk.slice(chunk.length - excess)];
+        writeBuf = Buffer.concat([...this._writableBuffer, chunk.subarray(0, chunk.length - excess)]);
+        this._writableBuffer = [chunk.subarray(chunk.length - excess)];
         this._writableBufferLength = excess;
       }
       this.instance.absorbRaw(this.bitrate, writeBuf);
@@ -448,7 +448,7 @@ export class Keccak {
     if (retainTrailing) {
       return buf;
     } else {
-      return buf.slice(0, byteLength);
+      return buf.subarray(0, byteLength);
     }
   }
 
@@ -536,42 +536,42 @@ export class KeccakRand extends KeccakWritable {
     // will never affect the contents of buffers returned by this method
     if (count < this.bufferLength) {
       debug('KeccakRand.bytes: requested', count, 'bytes, below buffer size of', this.bufferLength);
-      let buf = this._buffer!.slice(this._bufferIndex, this._bufferIndex + count);
-      this._buffer = this._buffer!.slice(this._bufferIndex + count);
+      let buf = this._buffer!.subarray(this._bufferIndex, this._bufferIndex + count);
+      this._buffer = this._buffer!.subarray(this._bufferIndex + count);
       this._bufferIndex = 0;
       return buf;
     } else if (this.bufferLength === count) {
       debug('KeccakRand.bytes: requested', count, 'bytes, equal to buffer size');
-      let buf = this._buffer!.slice(this._bufferIndex);
+      let buf = this._buffer!.subarray(this._bufferIndex);
       this.dropBuffer();
       return buf;
     } else if (count > this.bufferLength) {
       if (this.bufferLength) {
         // buffer exists and has bytes
-        let oldBuf = this._buffer!.slice(this._bufferIndex);
+        let oldBuf = this._buffer!.subarray(this._bufferIndex);
         let remaining = count - this.bufferLength;
         let newBuf = this.instance.squeeze(this.bitrate, remaining, true);
         debug('KeccakRand.bytes: requested', count, 'bytes, allocating', newBuf.length,
           'bytes over', oldBuf.length, 'bytes in buffer');
         if (newBuf.length > remaining) {
-          this._buffer = newBuf.slice(remaining);
+          this._buffer = newBuf.subarray(remaining);
           this._bufferIndex = 0;
           debug('KeccakRand.bytes: returning', this._buffer.length, 'bytes back to buffer');
         } else {
           this.dropBuffer();
         }
-        return Buffer.concat([oldBuf, newBuf.slice(0, remaining)]);
+        return Buffer.concat([oldBuf, newBuf.subarray(0, remaining)]);
       } else {
         debug('KeccakRand.bytes: requested', count, 'bytes, allocating', count, 'bytes');
         let newBuf = this.instance.squeeze(this.bitrate, count, true);
         if (newBuf.length > count) {
-          this._buffer = newBuf.slice(count);
+          this._buffer = newBuf.subarray(count);
           this._bufferIndex = 0;
           debug('KeccakRand.bytes: returning', this._buffer.length, 'bytes back to buffer');
         } else {
           this.dropBuffer();
         }
-        return newBuf.slice(0, count);
+        return newBuf.subarray(0, count);
       }
     } else {
       debug('uh oh');
@@ -588,13 +588,13 @@ export class KeccakRand extends KeccakWritable {
     if (count <= 0) return Buffer.alloc(0);
     let buf = this.instance.squeeze(this.bitrate, count, true);
     if (buf.length > count) {
-      this._buffer = buf.slice(count);
+      this._buffer = buf.subarray(count);
       this._bufferIndex = 0;
       debug('KeccakRand.bytesDirect: returning', this._buffer.length, 'bytes back to buffer');
     } else {
       this.dropBuffer();
     }
-    return buf.slice(0, count);
+    return buf.subarray(0, count);
   }
 
   /**
@@ -637,7 +637,7 @@ export class KeccakRand extends KeccakWritable {
         'but wanted', bytes, 'bytes, allocate', extraLength, 'bytes');
       let extra = this.instance.squeeze(this.bitrate, extraLength, true);
       if (this.bufferLength) {
-        buf = Buffer.concat([this._buffer!.slice(this._bufferIndex), extra]);
+        buf = Buffer.concat([this._buffer!.subarray(this._bufferIndex), extra]);
       } else {
         buf = extra;
       }

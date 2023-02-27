@@ -20,6 +20,17 @@ keccakRand.onNewEntropy = () => {
   for (let fn of newEntropyListeners) fn();
 };
 
+/* PRIVACY NOTE
+ * As long as Keccak remains secure up to 12 rounds and the browser is capable
+ * of providing high-quality entropy, it is functionally impossible for any
+ * person, including Hellomouse, to determine any of the inputs provided to
+ * Keccak.
+ *
+ * This implementation immediately seeds the Keccak state using the browser's
+ * cryptographically secure RNG. This is supplemented with mouse events. Attacks
+ * against outputs would require knowledge of both of these to succeed.
+ */
+
 export async function throwHellomouse(get = true, send = true) {
   if (get) {
     let r1 = await fetch('https://hellomouse.net/api/random?length=64');
