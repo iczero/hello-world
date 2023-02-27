@@ -104,17 +104,38 @@ export function RandFloatWidget() {
   </div>;
 }
 
+export function bytesToBigIntLE(buf: Buffer): bigint {
+  let n = 0n;
+  for (let i = 0; i < buf.length; i++) {
+    n |= BigInt(buf[i]) << (BigInt(i) * 8n);
+  }
+  return n;
+}
+
 export function RandBytesWidget() {
-  let [encoding, setEncoding] = useState<BufferEncoding>('base64');
+  let [encoding, setEncoding] = useState<string>('base64');
   let [length, setLength] = useState(64);
-  let [output, regenerate, times] = useMemoWithInvalidate(
-    () => keccakRand.bytes(length).toString(encoding), [encoding, length]);
+  let [output, regenerate, times] = useMemoWithInvalidate(() => {
+    switch (encoding) {
+      case 'bigint': {
+        if (length > 16384) return 'too long!';
+        return bytesToBigIntLE(keccakRand.bytes(length)).toString();
+      }
+      case 'base64':
+      case 'hex':
+      case 'utf-8':
+        return keccakRand.bytes(length).toString(encoding);
+      default:
+        throw new Error('unreachable');
+    }
+  }, [encoding, length]);
   return <div>
     <h2>Random bytes</h2>
     Length: <NumberInput integer={true} default={64} min={1} max={65536} onChange={setLength} /><br />
     Encoding: <select onChange={ev => setEncoding(ev.target.value as BufferEncoding)}>
       <option value="base64">base64</option>
       <option value="hex">hex</option>
+      <option value="bigint">bigint (warning: lag)</option>
       <option value="utf-8">UTF-8 (warning: expect nonsense)</option>
     </select><br />
     Output [{times}]: <br />
