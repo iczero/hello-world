@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Keccak, KeccakRand } from './keccak';
 import { Buffer } from 'buffer';
 import { onReady } from './ready';
+import { useMemoWithInvalidate } from './util';
 
 export let keccak = new Keccak(12);
 export let keccakRand = new KeccakRand(keccak, 1024);
@@ -35,7 +36,8 @@ export async function throwHellomouse(get = true, send = true) {
   if (get) {
     let r1 = await fetch('https://hellomouse.net/api/random?length=64');
     let buf = Buffer.from(await r1.arrayBuffer());
-    keccakRand.seedDirect(buf);
+    keccakRand.write(buf);
+    keccakRand.flush();
   }
   if (send) {
     await fetch('https://hellomouse.net/api/random', {
@@ -48,7 +50,8 @@ export async function throwHellomouse(get = true, send = true) {
 export function reseed(n = 256) {
   let buf = Buffer.alloc(n);
   window.crypto.getRandomValues(buf);
-  keccakRand.seedDirect(buf);
+  keccakRand.write(buf);
+  keccakRand.flush();
 }
 
 reseed();
@@ -120,22 +123,19 @@ export function getRandomString(length = 16) {
 
 export function useSubscribeEntropy(fn: () => any) {
   useEffect(() => {
-    addEntropyListener(fn);
-    return () => removeEntropyListener(fn);
+    let listener = () => setTimeout(fn);
+    addEntropyListener(listener);
+    return () => removeEntropyListener(listener);
   }, []);
 }
 
 export function KeccakButton(props: { length?: number }) {
-  let [randVal, setRandVal] = useState('');
-  function refresh() {
-    let val = getRandomString(props.length);
-    setRandVal(val);
-    return val;
-  }
-  useEffect(() => void refresh(), [props.length]);
+  let [randVal, refresh] = useMemoWithInvalidate(
+    () => getRandomString(props.length), [props.length]);
   function buttonClicked() {
-    let out = refresh();
-    navigator.clipboard?.writeText(out);
+    navigator.clipboard?.writeText(randVal);
+    keccakRand.flush();
+    refresh();
   }
   useSubscribeEntropy(refresh);
   return <button onClick={buttonClicked}>

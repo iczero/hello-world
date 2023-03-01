@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
 import * as stream from 'readable-stream';
 
-const shouldDebug = Boolean(process.env.DEBUG);
+const shouldDebug = false;
 const debug = shouldDebug ? console.log.bind(console, 'debug:') : () => {};
 
 type U64Pair = Uint32Array;
@@ -230,10 +230,19 @@ export class KeccakWritable extends stream.Writable {
         this._writableBufferLength = excess;
       }
       this.instance.absorbRaw(this.bitrate, writeBuf);
-      debug('KeccakWritable._write: flushing', writeBuf.length, 'bytes to keccak');
+      debug('KeccakWritable._write: writing', writeBuf.length, 'bytes to keccak');
       this.onWritableFlush();
     }
     callback(null);
+  }
+
+  /** Write internal buffer to keccak, padding as appropriate */
+  _flushBuffer() {
+    // we can directly use Keccak.absorb on the remaining bytes
+    this.instance.absorb(this.bitrate, Buffer.concat(this._writableBuffer), this.trailingBits, this.bitLength);
+    this._writableBuffer = [];
+    this._writableBufferLength = 0;
+    this.onWritableFlush();
   }
 
   /**
@@ -241,9 +250,7 @@ export class KeccakWritable extends stream.Writable {
    * @param callback
    */
   _final(callback: (error?: Error | null) => void) {
-    // we can directly use Keccak.absorb on the remaining bytes
-    this.instance.absorb(this.bitrate, Buffer.concat(this._writableBuffer), this.trailingBits, this.bitLength);
-    this.onWritableFlush();
+    this._flushBuffer();
     callback(null);
   }
 
@@ -524,6 +531,12 @@ export class KeccakRand extends KeccakWritable {
     }
     this.dropBuffer();
     if (this.onNewEntropy) this.onNewEntropy();
+  }
+
+  /** Flushes write stream buffer */
+  flush() {
+    if (this._writableBufferLength > 0) this._flushBuffer();
+    return this;
   }
 
   /**
