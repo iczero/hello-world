@@ -9,7 +9,7 @@ import { YayPage } from './pages/yay';
 import { ARXDerp } from './pages/arx-derp';
 import { KeccakPage } from './pages/keccak';
 import { FakerPage } from './pages/fakerjs';
-import { Router } from '@remix-run/router';
+import { Router, Path as RouterPath } from '@remix-run/router';
 
 export function UnknownRoute() {
   let navigate = useNavigate();
@@ -28,28 +28,41 @@ function RootErrorHandler() {
   let location = useLocation();
   let error: any = useRouteError();
 
-  console.log('error', error);
-  console.log('location', location);
-
+  let navigateTo: Partial<RouterPath> | null = null;
   // handle errors from urls such as page.html#path, redirect to page.html#/path
   if (error?.internal && error?.status === 404) {
     if (!location.pathname.startsWith('/')) {
-      useEffect(() => navigate({
+      navigateTo = {
         pathname: '/' + location.pathname,
         search: location.search,
         hash: location.hash
-      }, { replace: true }));
-      return <div>Redirecting...</div>;
+      };
     }
   }
 
-  console.error(`error rendering page ${location.pathname}:`, error);
-  return <div>
-    <pre>
-      Error rendering page "{location.pathname}" (see console)<br />
-      {error.toString()}
-    </pre>
-  </div>;
+  useEffect(() => {
+    if (navigateTo) {
+      console.log('redirecting to', navigateTo.pathname);
+      navigate(navigateTo, { replace: true });
+    }
+  });
+
+  useEffect(() => {
+    if (!navigateTo) {
+      console.error(`error rendering page ${location.pathname}:`, error);
+    }
+  }, []);
+
+  if (navigateTo) {
+    return <div>Redirecting...</div>;
+  } else {
+    return <div>
+      <pre>
+        Error rendering page "{location.pathname}" (see console)<br />
+        {error.toString()}
+      </pre>
+    </div>;
+  }
 }
 
 export function AppRoot() {
