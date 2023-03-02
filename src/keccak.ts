@@ -533,9 +533,12 @@ export class KeccakRand extends KeccakWritable {
     if (this.onNewEntropy) this.onNewEntropy();
   }
 
-  /** Flushes write stream buffer */
-  flush() {
-    if (this._writableBufferLength > 0) this._flushBuffer();
+  /**
+   * Flushes write stream buffer
+   * @param writeEmpty Whether to write an empty (padding) block if the buffer is empty
+   */
+  flush(writeEmpty = false) {
+    if (this._writableBufferLength > 0 || writeEmpty) this._flushBuffer();
     return this;
   }
 

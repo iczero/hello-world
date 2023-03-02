@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Keccak, KeccakRand } from './keccak';
 import { Buffer } from 'buffer';
 import { onReady } from './ready';
@@ -123,21 +123,35 @@ export function getRandomString(length = 16) {
 
 export function useSubscribeEntropy(fn: () => any) {
   useEffect(() => {
-    let listener = () => setTimeout(fn);
+    let listener = () => queueMicrotask(fn);
     addEntropyListener(listener);
     return () => removeEntropyListener(listener);
   }, []);
 }
 
 export function KeccakButton(props: { length?: number }) {
+  let writeClipboard = useRef(false);
   let [randVal, refresh] = useMemoWithInvalidate(
     () => getRandomString(props.length), [props.length]);
+
   function buttonClicked() {
-    navigator.clipboard?.writeText(randVal);
+    let buf = Buffer.alloc(2);
+    buf.writeUInt16LE(performance.now() & 0xffff);
+    keccakRand.write(buf);
     keccakRand.flush();
-    refresh();
+    writeClipboard.current = true;
   }
+
+  useEffect(() => {
+    if (writeClipboard.current) {
+      // write current value to clipboard if button clicked
+      navigator.clipboard?.writeText(randVal);
+      writeClipboard.current = false;
+    }
+  });
+
   useSubscribeEntropy(refresh);
+
   return <button onClick={buttonClicked}>
     <pre>{randVal}</pre>
     <style jsx>{`
