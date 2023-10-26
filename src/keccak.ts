@@ -465,6 +465,24 @@ export class Keccak {
   }
 }
 
+/**
+ * Extract bits from buffer
+ * @param buf Source buffer
+ * @param bitIdx Index to start bits
+ * @param count How many bits
+ * @return Numerical value, or null if not enough bits in buffer
+ */
+export function extractBits(buf: Buffer, bitIdx: number, count: number): number | null {
+  if (count > 52) {
+    throw new Error('too many bits to fit in number');
+  }
+
+  let startByte = Math.floor(bitIdx / 8);
+  let endByte = Math.floor((bitIdx + count) / 8);
+  // i may or may not have forgotten what this is for
+  throw new Error('TODO');
+}
+
 /** Random number generator using keccak */
 export class KeccakRand extends KeccakWritable {
   /* Brief overview of implementation

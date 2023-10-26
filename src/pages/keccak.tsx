@@ -14,6 +14,7 @@ export function KeccakPage() {
     <CoinFlipWidget />
     <RandIntWidget />
     <RandFloatWidget />
+    <RandUUIDWidget />
     <RandColorWidget />
     <RandNormWidget />
     <RandBytesWidget />
@@ -111,6 +112,43 @@ export function bytesToBigIntLE(buf: Buffer): bigint {
     n |= BigInt(buf[i]) << (BigInt(i) * 8n);
   }
   return n;
+}
+
+export function randomUuidV4() {
+  let buf = keccakRand.bytes(16);
+  // see https://github.com/uuidjs/uuid/blob/master/src/v4.js
+  buf[6] = (buf[6] & 0b00001111) | 0x40; // set version
+  buf[8] = (buf[8] & 0b00111111) | 0b10000000; // set "clock sequence" bits
+
+  // 4-2-2-2-6
+  // xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+  let byteToHex = (byte: number) => ((byte & 0xf0) >> 4).toString(16) + (byte & 0x0f).toString(16);
+  let idx = 0;
+  let uuid = [4, 2, 2, 2, 6].map(count => {
+    let ret = '';
+    for (let i = 0; i < count; i++) ret += byteToHex(buf[idx++]);
+    return ret;
+  }).join('-');
+  return uuid;
+}
+
+export function RandUUIDWidget() {
+  let [count, setCount] = useState(1);
+  let [output, regenerate, times] = useMemoWithInvalidate(() => {
+    keccakRand.flush();
+    return new Array(count)
+      .fill(null)
+      .map(() => randomUuidV4())
+      .join('\n')
+      .toString();
+  }, [count]);
+  return <div>
+    <h2>Random v4 UUID</h2>
+    Count: <NumberInput integer={true} default={1} min={1} max={1024} onChange={setCount} /><br />
+    Output [{times}]:
+    <pre style={{ margin: 0 }}>{output}</pre>
+    <button onClick={regenerate}>Regenerate</button>
+  </div>;
 }
 
 export function RandBytesWidget() {
